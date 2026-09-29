@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Botão Flutuante</title>
+<!--<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #fff; font-family: system-ui, sans-serif; }
+  #btn {
+    position: absolute; top: 0; left: 0;
+    padding: 18px 32px; font-size: 20px; font-weight: 600;
+    border: 0; border-radius: 12px; background: #111; color: #fff;
+    cursor: pointer; will-change: transform;
+  }
+  #btn:hover { background: #e63946; }
+  footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 13px; color: #888; }
+</style>-->
+</head>
+<body>
+<button id="btn">Clique aqui</button>
+<button id="btn1">Clique aqui</button>
+<footer>Um projeto inútil. O botão às vezes bate no canto.</footer>
+
+<script>
+  const btn = document.getElementById('btn');
+  let x = Math.random() * 200, y = Math.random() * 200;
+  let vx = 3, vy = 2.5; // pixels por quadro (~60fps)
+  let last = performance.now();
+
+  function frame(now) {
+    const dt = Math.min((now - last) / 16.667, 3); // normaliza pelo tempo
+    last = now;
+    const maxX = window.innerWidth - btn.offsetWidth;
+    const maxY = window.innerHeight - btn.offsetHeight;
+
+    x += vx * dt;
+    y += vy * dt;
+
+    if (x <= 0)     { x = 0;    vx =  Math.abs(vx); }
+    if (x >= maxX)  { x = maxX; vx = -Math.abs(vx); }
+    if (y <= 0)     { y = 0;    vy =  Math.abs(vy); }
+    if (y >= maxY)  { y = maxY; vy = -Math.abs(vy); }
+
+    btn.style.transform = `translate(${x}px, ${y}px)`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  btn.addEventListener('click', () => { window.location.href = 'imagem.html'; });
+</script>
+</body>
+</html>
