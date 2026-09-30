@@ -2,49 +2,83 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 'user-scalable=no' e 'touch-action: none' impedem zoom acidental e rolagem ao tentar tocar no botão -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>O Botão Flutuante</title>
-<!--<style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #fff; font-family: system-ui, sans-serif; }
-  #btn {
-    position: absolute; top: 0; left: 0;
-    padding: 18px 32px; font-size: 20px; font-weight: 600;
-    border: 0; border-radius: 12px; background: #111; color: #fff;
-    cursor: pointer; will-change: transform;
+<style>
+  html, body { 
+    margin: 0; 
+    height: 100%; 
+    width: 100%;
+    overflow: hidden; 
+    background: #fff; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Impede seleção de texto ou destaques azuis ao tocar repetidamente no iOS/Android */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
   }
-  #btn:hover { background: #e63946; }
-  footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 13px; color: #888; }
-</style>-->
+
+  #btn:active { 
+    background: #e63946; 
+  }
+
+</style>
 </head>
 <body>
+
 <button id="btn">Clique aqui</button>
 
 <script>
   const btn = document.getElementById('btn');
-  let x = Math.random() * 200, y = Math.random() * 200;
-  let vx = 3, vy = 2.5; // pixels por quadro (~60fps)
+  
+  // Posiciona o botão em um ponto seguro inicial
+  let maxX = Math.max(0, window.innerWidth - btn.offsetWidth);
+  let maxY = Math.max(0, window.innerHeight - btn.offsetHeight);
+  let x = Math.random() * (maxX || 100);
+  let y = Math.random() * (maxY || 100);
+  
+  let vx = 3, vy = 2.5; 
   let last = performance.now();
 
   function frame(now) {
-    const dt = Math.min((now - last) / 16.667, 3); // normaliza pelo tempo
+    const dt = Math.min((now - last) / 16.667, 3);
     last = now;
-    const maxX = window.innerWidth - btn.offsetWidth;
-    const maxY = window.innerHeight - btn.offsetHeight;
+
+    // Atualiza limites dinamicamente
+    maxX = window.innerWidth - btn.offsetWidth;
+    maxY = window.innerHeight - btn.offsetHeight;
 
     x += vx * dt;
     y += vy * dt;
 
+    // Colisões nas bordas
     if (x <= 0)     { x = 0;    vx =  Math.abs(vx); }
     if (x >= maxX)  { x = maxX; vx = -Math.abs(vx); }
     if (y <= 0)     { y = 0;    vy =  Math.abs(vy); }
     if (y >= maxY)  { y = maxY; vy = -Math.abs(vy); }
 
-    btn.style.transform = `translate(${x}px, ${y}px)`;
+    btn.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
-  btn.addEventListener('click', () => { window.location.href = 'imagem.html'; });
+  // Redimensionamento de janela (troca de orientação de celular)
+  window.addEventListener('resize', () => {
+    maxX = window.innerWidth - btn.offsetWidth;
+    maxY = window.innerHeight - btn.offsetHeight;
+    x = Math.min(x, Math.max(0, maxX));
+    y = Math.min(y, Math.max(0, maxY));
+  });
+
+  // Ação ao tocar/clicar (pointerdown é instantâneo em telas touch e desktops)
+  function redirecionar(e) {
+    e.preventDefault();
+    window.location.href = 'imagem.html';
+  }
+
+  btn.addEventListener('pointerdown', redirecionar);
 </script>
 </body>
 </html>
